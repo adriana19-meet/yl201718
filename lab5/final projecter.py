@@ -11,7 +11,7 @@ SCREEN_WIDTH = turtle.getcanvas().winfo_width()/2
 SCREEN_HEIGHT =  turtle.getcanvas().winfo_height()/2
 NUMBER_OF_BALLS = 5 
 MINIMUM_BALL_r = 10
-MAXIMUM_BALL_r = 100
+MAXIMUM_BALL_r = 40
 MINIMUM_BALL_DX = -5
 MAXIMUM_BALL_DX = 5
 MINIMUM_BALL_DY = -5
@@ -25,7 +25,7 @@ TIME_FONT_TYPE = "bold"
 TIME_FONT_NAME = "Helvetica"
 TIME_COLOR = "black"
 
-WRITE_FONT_SIZE = 150
+WRITE_FONT_SIZE = 50
 WRITE_FONT_TYPE = "bold"
 WRITE_FONT_NAME = "Helvetica"
 WRITE_COLOR = "blue"
@@ -47,7 +47,10 @@ timeWrite.color(SCORE_COLOR)
 timeWrite.ht()
 timeScore = 0 
 
-
+SCORE_FONT_SIZE = 15
+SCORE_FONT_TYPE = "bold"
+SCORE_FONT_NAME = "Helvetica"
+SCORE_COLOR = "black"
 
 
 
@@ -86,7 +89,7 @@ class Ball(Turtle):
 		if current_y <= -height:
 			self.dy = 0.3		
 			
-MY_BALL = Ball(5, 10, 0, 0, 20, "red")
+MY_BALL = Ball(5, 10, 0, 0, 20, "black")
 for i in range(NUMBER_OF_BALLS):
 
 	x = random.randint(-SCREEN_WIDTH + MAXIMUM_BALL_r , SCREEN_WIDTH - MAXIMUM_BALL_r)
@@ -163,6 +166,20 @@ def check_all_balls_collision():
 					ball_b.shapesize(ball_b.r/10)
 
 
+				x2 = random.randint (-SCREEN_WIDTH + MAXIMUM_BALL_r , SCREEN_WIDTH - MINIMUM_BALL_r)
+				y2 = random.randint (-SCREEN_HEIGHT + MAXIMUM_BALL_r , SCREEN_HEIGHT - MINIMUM_BALL_r )
+				x_speed = random.randint(MINIMUM_BALL_DX , MAXIMUM_BALL_DX)
+				y_speed = random.randint(MINIMUM_BALL_DY , MAXIMUM_BALL_DY)
+				while x_speed == 0:
+					x_speed  = random.randint(MINIMUM_BALL_DX , MAXIMUM_BALL_DX)
+				while y_speed  == 0:
+					y_speed = random.randint(MINIMUM_BALL_DY ,MAXIMUM_BALL_DY )
+				r2 = random.randint(MINIMUM_BALL_r,MAXIMUM_BALL_r)
+				color2 = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+
+
+
+
 def check_myball_collision():
 	for i in Balls:
 		if collide (MY_BALL,i) == True:
@@ -188,10 +205,12 @@ def check_myball_collision():
 				i.goto(x2,y2)
 				i.dx = x_speed2
 				i.dy = y_speed2
-				MY_BALL.r = ball_a.r +1
+				ball_a = Ball(5,10,0,0,20,"black")
+				MY_BALL.r = MY_BALL.r +20
 				MY_BALL.shapesize(MY_BALL.r/10)
 			
 			else:
+				youLose()
 				return False
 
 	return True 
@@ -236,44 +255,74 @@ def creaetefood():
 		food = Ball(x,y,0,0,radius,color) 
 		FOOD.append(food)
 
+def score():
+	scoreWrite.goto(-SCREEN_WIDTH + 10, -SCREEN_HEIGHT + 10)
+	scoreWrite.clear()
+	scoreWrite.write("Score: " + str(int(MY_BALL.radius * 2)), False, "left", (SCORE_FONT_NAME, SCORE_FONT_TYPE, SCORE_FONT_SIZE))
+
+def youLose():
+	scoreWrite.goto((-SCREEN_WIDTH / 2) + 25, -100)
+	timeWrite.goto(195, -200)
+	turtle.goto(-200,0)
+	writeToScreeen.goto(-SCREEN_WIDTH / 2, -50)
+	writeToScreeen.clear()
+	scoreWrite.clear()
+	timeWrite.clear()
+	turtle.write("try again", False, "left", (WRITE_FONT_NAME, WRITE_FONT_SIZE, WRITE_FONT_TYPE))
+	scoreWrite.write("Score: " + str(int(MY_BALL.r * 2)), False, "left", (SCORE_FONT_NAME, 25, SCORE_FONT_TYPE))
+	timeWrite.write("Time: " + str(timeScore), False, "left", (SCORE_FONT_NAME, 25, SCORE_FONT_TYPE))
+	
+
+
+
+
 
 def timerDisplay():
 	global timeScore
 	timeScore = int(time.clock() * 1.5)
 	timeWrite.goto(-SCREEN_WIDTH +10, SCREEN_HEIGHT - 30)
 	timeWrite.clear()
-	timeWrite.write("Time: " + str(timeScore), False, "left", (TIME_FONT_NAME, TIME_FONT_SIZE, TIME_FONT_TYPE)
+	timeWrite.write("Time: " + str(timeScore), False, "left", (TIME_FONT_NAME, TIME_FONT_SIZE, TIME_FONT_TYPE))
 
 
 
 
 
-while RUNNING:
-	if SCREEN_WIDTH != getcanvas().winfo_width()/2:
-		SCREEN_WIDTH = getcanvas().winfo_width()/2
 
-	elif SCREEN_HEIGHT != getcanvas().winfo_height()/2:
-		SCREEN_HEIGHT = getcanvas().winfo_height()/2
+
+
+while RUNNING :
+	if SCREEN_WIDTH != turtle.getcanvas().winfo_width()/2:
+	 	SCREEN_WIDTH = turtle.getcanvas().winfo_width()/2
+
+	if SCREEN_HEIGHT != turtle.getcanvas().winfo_height()/2:
+	 	SCREEN_HEIGHT = turtle.getcanvas().winfo_height()/2
 
 
 	move_all_balls()
 	check_all_balls_collision()
 	MY_BALL.move(SCREEN_WIDTH , SCREEN_HEIGHT)
+
+
 	if check_myball_collision() == False:
 		RUNNING = False
 		
 	else:
-	 	RUNNING = True
+	  	RUNNING = True
 
-
-
+	if MY_BALL.r > 200:
+		youLose()
+		time.sleep(5)
+		quit()
 	getscreen().update()
 	time.sleep(0.01)
 
+	timerDisplay()
+
+	
 
 
-
-
+mainloop()
 
 
 
